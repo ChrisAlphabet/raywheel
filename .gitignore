@@ -53,3 +53,14 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# vim files
+tags
+*.swp
+
+# project files
+main
+main.data
+main.html
+main.js
+main.wasm
