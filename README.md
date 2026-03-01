@@ -1,7 +1,10 @@
-# raywheel
+# Raywheel
+
+## What is this?
+Have you seen [wheelofnames.com](https://wheelofnames.com/) and ever thought to your self "what if it was much worse?"  
 
 ## Disclaimer
-This is not production-ready code, just experiments sitting on the couch with a laptop in the tiny window after my newborn falls asleep before I fall asleep.  
+This is not "production-ready code", just Raylib experiments in the fleeting moments between when my newborn is asleep and I am somehow awake. 
 
 ## Build
 * [Follow instructions to install raylib on GNU Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux)  
