@@ -27,6 +27,11 @@ static constexpr Vector2 TRI_V1 = {CENTER.x + CIRCLE_RADIUS, CENTER.y };
 static constexpr Vector2 TRI_V2 = {CENTER.x + CIRCLE_RADIUS + TRI_SIZE, CENTER.y  + TRI_SIZE };
 static constexpr Vector2 TRI_V3 = {CENTER.x + CIRCLE_RADIUS + TRI_SIZE, CENTER.y  - TRI_SIZE };
 
+// button constants
+static constexpr int BUTTON_HEIGHT = { 50 };
+static constexpr int BUTTON_WIDTH = { 250 };
+static constexpr Rectangle button = { CENTER.x - (BUTTON_WIDTH / 2), CENTER.y - (BUTTON_HEIGHT / 2), BUTTON_WIDTH, BUTTON_HEIGHT };
+
 typedef struct {
         char name[MAX_NAME];
         int week;
@@ -64,6 +69,7 @@ bool angleInRange(int target, int lower, int upper)
         else return (target >= lower || target <= upper);
 }
 
+// load players onto the wheel from a csv file
 void load_wheel(Wheel * wheel, const char * fname)
 {
         FILE * f = fopen(fname, "r");
@@ -103,7 +109,7 @@ int main(void)
 
         // variable for rendering wheel
         Vector2 text_pos = {0, 0};
-        float text_radius = 200.0f;
+        float text_radius = 150.0f;
         float rotation = 0.0f;
         float sector_size = 0.0f;
         unsigned int friction = GetRandomValue(100, 255);
@@ -146,6 +152,7 @@ int main(void)
                                 data_loaded = true;
                         }
                 }
+                // render the wheel
                 else
                 {
                         // control the rotation speed
@@ -192,6 +199,26 @@ int main(void)
                                 int winner_width = MeasureText(winner_banner, banner_font_size);
                                 Vector2 banner_pos = { CENTER.x - (winner_width / 2), CENTER.y + CIRCLE_RADIUS + banner_font_size };
                                 DrawText(winner_banner, banner_pos.x, banner_pos.y, banner_font_size, wheel.players[wheel.i_winner].color);
+
+                                // show results
+                                Color button_color = GRAY;
+                                Vector2 mouse_pos = GetMousePosition(); 
+                                if (CheckCollisionPointRec(mouse_pos, button)) 
+                                {
+                                        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
+                                        {
+                                                button_color = DARKGRAY;
+                                                SetClipboardText("TODO");
+                                        }
+                                }
+                                
+                                // render button
+                                char button_text[] = "COPY JUDGEMENTS";
+                                int button_width = MeasureText(button_text, 20);
+                                Vector2 text_pos = { button.x + (button.width / 2) - (button_width / 2), button.y + (button.height / 2) - 10};
+                                DrawRectangleRec(button, button_color);
+                                DrawRectangleLinesEx(button, 2, DARKGRAY);
+                                DrawText(button_text, text_pos.x, text_pos.y, 20, wheel.players[wheel.i_winner].color);
                         }
                         
                         // if the wheel has stopped
@@ -209,7 +236,7 @@ int main(void)
                                         // the game is over and we have a winner!
                                         wheel.spin = false;
                                         wheel.i_winner = i_selected;
-                                        friction = 60;
+                                        friction = 255;
                                 }
                                 else
                                 {
