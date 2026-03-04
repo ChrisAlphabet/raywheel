@@ -8,16 +8,16 @@
 #endif // PLATFORM_WEB
 
 // player constants
-static constexpr int MAX_PEOPLE = { 25 };
-static constexpr int MAX_NAME = { 25 };
+static constexpr int MAX_N_SOULS = { 25 };
+static constexpr int MAX_SOUL = { 25 };
 static constexpr int MAX_LINE = { 50 };
-static constexpr size_t MAX_JUDGEMENTS = { MAX_PEOPLE * MAX_LINE };
+static constexpr size_t MAX_JUDGEMENTS = { MAX_N_SOULS * MAX_LINE };
 
 // window constants
 static constexpr int FPS = { 60 };
 static constexpr int WIDTH = { 1200 };
 static constexpr int HEIGHT = { 800 };
-static constexpr Vector2 CENTER = {WIDTH/2, HEIGHT/2};
+static constexpr Vector2 CENTER = {WIDTH / 2, HEIGHT / 2};
 static constexpr float CIRCLE_RADIUS = { 250.0f };
 static constexpr int banner_font_size = { 50 };
 static const char banner[] = "PRAISE BE TO THE WHEEL!";
@@ -35,8 +35,8 @@ static constexpr int BUTTON_WIDTH = { 250 };
 static constexpr Rectangle button = { CENTER.x - (BUTTON_WIDTH / 2), CENTER.y - (BUTTON_HEIGHT / 2), BUTTON_WIDTH, BUTTON_HEIGHT };
 
 typedef struct {
-        char name[MAX_NAME];
-        int week;
+        char soul[MAX_SOUL];
+        int last_judged_unworthy;
         bool active;
         float start_angle;
         float end_angle;
@@ -45,9 +45,9 @@ typedef struct {
 
 typedef struct {
         bool spin;
-        int N_players;
+        int N_souls;
         int N_active;
-        Player players[MAX_PEOPLE];
+        Player players[MAX_N_SOULS];
         int i_winner;
 } Wheel;
 
@@ -87,17 +87,17 @@ void load_wheel(Wheel * wheel, const char * fname)
         // consume the csv header row
         fgets(line, sizeof(line), f);
         // process the csv data to populate the player data
-        while(fgets(line, sizeof(line), f) && (count < MAX_PEOPLE))
+        while(fgets(line, sizeof(line), f) && (count < MAX_N_SOULS))
         {
-                sscanf(line, "%24[^,],%d", wheel->players[count].name, &wheel->players[count].week); 
+                sscanf(line, "%24[^,],%d", wheel->players[count].soul, &wheel->players[count].last_judged_unworthy); 
                 wheel->players[count].color = randomColor();
                 wheel->players[count].active = true;
                 count++;
         }
 
         // set the number of players and count all players as active
-        wheel->N_players = count;
-        wheel->N_active = wheel->N_players;
+        wheel->N_souls = count;
+        wheel->N_active = wheel->N_souls;
 
         // close the csv data
         fclose(f);
@@ -107,9 +107,9 @@ void pass_judgement(Wheel * wheel, char souls[static MAX_JUDGEMENTS])
 {
         size_t offset = 0;
         size_t available = MAX_JUDGEMENTS;
-        for (int i = 0; i < wheel->N_players; i++)
+        for (int i = 0; i < wheel->N_souls; i++)
         {
-                offset += snprintf(souls + offset, available, "%s,%d\n", wheel->players[i].name, wheel->players[i].week);
+                offset += snprintf(souls + offset, available, "%s,%d\n", wheel->players[i].soul, wheel->players[i].last_judged_unworthy);
                 available -= offset;
         }
 }
@@ -150,7 +150,7 @@ int main(void)
 
                 ClearBackground(RAYWHITE);
                 
-                DrawText("PRAISE BE TO THE WHEEL!", banner_pos.x, banner_pos.y, banner_font_size, BLACK);
+                DrawText(banner, banner_pos.x, banner_pos.y, banner_font_size, BLACK);
 
                 // load player data
                 if (!data_loaded)
@@ -178,7 +178,7 @@ int main(void)
                         // reset the index used to offset the starting angle of each player
                         i_active = 0;
 
-                        for (int i = 0; i < wheel.N_players; i++)
+                        for (int i = 0; i < wheel.N_souls; i++)
                         {
                                 // skip inactive players that have been judged worthy
                                 if (!wheel.players[i].active) continue;        
@@ -198,7 +198,7 @@ int main(void)
                                 
                                 // render the circle sector and text
                                 DrawCircleSector(CENTER, CIRCLE_RADIUS, wheel.players[i].start_angle, wheel.players[i].end_angle, 100, wheel.players[i].color);
-                                DrawText(wheel.players[i].name, text_pos.x + CENTER.x, text_pos.y + CENTER.y, 20, BLACK); 
+                                DrawText(wheel.players[i].soul, text_pos.x + CENTER.x, text_pos.y + CENTER.y, 20, BLACK); 
                                 
                                 // increment the active counter
                                 i_active++;
@@ -208,7 +208,7 @@ int main(void)
                         {
                                 // show winner
                                 char winner_banner[51];
-                                snprintf(winner_banner, sizeof(winner_banner), "%s has been judged unworthy!", wheel.players[wheel.i_winner].name);
+                                snprintf(winner_banner, sizeof(winner_banner), "%s has been judged unworthy!", wheel.players[wheel.i_winner].soul);
                                 int winner_width = MeasureText(winner_banner, banner_font_size);
                                 Vector2 banner_pos = { CENTER.x - (winner_width / 2), CENTER.y + CIRCLE_RADIUS + banner_font_size };
                                 DrawText(winner_banner, banner_pos.x, banner_pos.y, banner_font_size, wheel.players[wheel.i_winner].color);
