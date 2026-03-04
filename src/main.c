@@ -52,14 +52,14 @@ typedef struct {
 } Wheel;
 
 // return a random color
-Color randomColor(void)
+Color random_color(void)
 {
         Color color = { GetRandomValue(0, 255), GetRandomValue(0, 255), GetRandomValue(0, 255), 255 };
         return color;
 }
 
 // check if a target angle is within a range
-bool angleInRange(int target, int lower, int upper)
+bool angle_in_range(int target, int lower, int upper)
 {
         // due to a raylib quirk, the upper and lower ranges can be greater than 360 so handle that in here
         lower = fmodf(lower, 360.0f);
@@ -90,7 +90,7 @@ void load_wheel(Wheel * wheel, const char * fname)
         while(fgets(line, sizeof(line), f) && (count < MAX_N_SOULS))
         {
                 sscanf(line, "%24[^,],%d", wheel->players[count].soul, &wheel->players[count].last_judged_unworthy); 
-                wheel->players[count].color = randomColor();
+                wheel->players[count].color = random_color();
                 wheel->players[count].active = true;
                 count++;
         }
@@ -188,7 +188,7 @@ int main(void)
                                 wheel.players[i].end_angle = wheel.players[i].start_angle + sector_size; 
                                 
                                 // mark the current player selected/worthy if the game is still active
-                                if (angleInRange(0.0f, wheel.players[i].start_angle, wheel.players[i].end_angle) && wheel.spin) 
+                                if (angle_in_range(0.0f, wheel.players[i].start_angle, wheel.players[i].end_angle) && wheel.spin) 
                                         i_selected = i;
                                 
                                 // calculate the player text location
