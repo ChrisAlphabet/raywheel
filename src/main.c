@@ -2,6 +2,7 @@
 #include <math.h>
 #include "raylib.h"
 
+// pretty neat that this is all you need to target WebAssembly
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
 #endif // PLATFORM_WEB
@@ -10,6 +11,7 @@
 static constexpr int MAX_PEOPLE = { 25 };
 static constexpr int MAX_NAME = { 25 };
 static constexpr int MAX_LINE = { 50 };
+static constexpr size_t MAX_JUDGEMENTS = { MAX_PEOPLE * MAX_LINE };
 
 // window constants
 static constexpr int FPS = { 60 };
@@ -99,6 +101,17 @@ void load_wheel(Wheel * wheel, const char * fname)
 
         // close the csv data
         fclose(f);
+}
+
+void pass_judgement(Wheel * wheel, char souls[static MAX_JUDGEMENTS])
+{
+        size_t offset = 0;
+        size_t available = MAX_JUDGEMENTS;
+        for (int i = 0; i < wheel->N_players; i++)
+        {
+                offset += snprintf(souls + offset, available, "%s,%d\n", wheel->players[i].name, wheel->players[i].week);
+                available -= offset;
+        }
 }
 
 int main(void)
@@ -208,7 +221,9 @@ int main(void)
                                         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) 
                                         {
                                                 button_color = DARKGRAY;
-                                                SetClipboardText("TODO");
+                                                char judgements[MAX_JUDGEMENTS]; 
+                                                pass_judgement(&wheel, judgements);
+                                                SetClipboardText(judgements);
                                         }
                                 }
                                 
