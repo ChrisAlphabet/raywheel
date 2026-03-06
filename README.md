@@ -16,6 +16,13 @@ This is not "production-ready code", just Raylib experiments in the fleeting mom
 ## Run  
 * `cd raywheel`  
 * `./main`  
+* Drag a csv file in that contains names and the weeks since last judged unworthy:
+```
+name,weeks
+Chris,0
+Foo,2
+Bar,5
+```
 
 ## Web
 Note that you might need to clean raylib first, seemed that building for desktop and web might have some cached file issue:  
