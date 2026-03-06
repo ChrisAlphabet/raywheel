@@ -109,7 +109,14 @@ void pass_judgement(Wheel * wheel, char souls[static MAX_JUDGEMENTS])
         size_t available = MAX_JUDGEMENTS;
         for (int i = 0; i < wheel->N_souls; i++)
         {
-                offset += snprintf(souls + offset, available, "%s,%d\n", wheel->players[i].soul, wheel->players[i].last_judged_unworthy);
+                if (i == wheel->i_winner)
+                {
+                        offset += snprintf(souls + offset, available, "%s,%d\n", wheel->players[i].soul, 0);
+                }
+                else
+                {
+                        offset += snprintf(souls + offset, available, "%s,%d\n", wheel->players[i].soul, wheel->players[i].last_judged_unworthy + 1);
+                }
                 available -= offset;
         }
 }
